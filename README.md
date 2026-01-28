@@ -14,21 +14,36 @@ Your blog will be:
 
 ## What You Need
 
+### Step 1: Create Accounts (Everyone - Do This First)
+
+**Create these three free accounts before installing any software:**
+
+- **GitHub account**: Go to [github.com](https://github.com) and sign up
+- **Vercel account**: Go to [vercel.com](https://vercel.com) and sign up (use "Continue with GitHub" button)
+- **Anthropic account** (for Claude): Go to [anthropic.com](https://anthropic.com) and sign up
+
+You'll use these accounts during the blog setup process.
+
+### Step 2: Install Software
+
 **Note**: The setup is different for Mac and Windows, but once installed, the "How to Create Your Blog" section below is the same for both.
 
-### For Mac Users
+#### For Mac Users
 
 1. Install **Homebrew** (a tool installer for Mac):
-   - Open Terminal (find it in Applications > Utilities)
+   - Open Terminal (Applications folder > Utilities folder > Terminal)
    - Paste this command and press Enter:
      ```
      /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
      ```
-   - Follow the instructions on screen
+   - Follow the instructions on screen (this may take a few minutes)
 
 2. Install **Node.js** (software that runs websites):
-   - In Terminal, type: `brew install node`
-   - Press Enter and wait for it to finish
+   - In Terminal, paste this command and press Enter:
+     ```
+     brew install node
+     ```
+   - Wait for it to finish
 
 3. Install **Claude Code** (the AI that builds your blog):
    - In Terminal, paste this command and press Enter:
@@ -37,7 +52,7 @@ Your blog will be:
      ```
    - Wait for it to finish, then close and reopen Terminal
 
-### For Windows Users
+#### For Windows Users
 
 1. Install **Node.js**:
    - Go to [nodejs.org](https://nodejs.org)
@@ -58,15 +73,7 @@ Your blog will be:
      ```
    - Wait for it to finish, then close and reopen PowerShell
 
-### Free Accounts You Need (Mac and Windows)
-
-- **GitHub account**: Go to [github.com](https://github.com) and sign up
-- **Vercel account**: Go to [vercel.com](https://vercel.com) and sign up (use "Continue with GitHub" button)
-- **Anthropic account** (for Claude): Go to [anthropic.com](https://anthropic.com) and sign up
-
 ## How to Create Your Blog
-
-**Before you start**: Make sure you created the three accounts described above (GitHub, Vercel, and Anthropic).
 
 **Note**: These steps work the same on Mac and Windows. On Mac, use Terminal. On Windows, use PowerShell.
 
@@ -75,7 +82,7 @@ Your blog will be:
    - **Windows**: Open PowerShell (search for "PowerShell" in the Start menu)
 
 2. **Create folders and download setup instructions**:
-   - Copy all the lines below
+   - Select and copy all 5 lines in the code block below (just the lines, not the \`\`\` marks around them)
    - Paste them into Terminal (Mac) or PowerShell (Windows)
    - Press Enter
    ```
@@ -85,13 +92,14 @@ Your blog will be:
    cd my-blog
    curl -o PROMPT.md https://raw.githubusercontent.com/lucadellanna/blog-in-a-box/main/PROMPT.md
    ```
+   This downloads the instructions that Claude will follow to build your blog.
 
 3. **Start Claude Code**:
    ```
    claude
    ```
-   - You'll be asked to log in - follow the instructions
-   - A chat window will open
+   - You'll be asked to log in with your Anthropic account - follow the instructions
+   - A chat window will open in your Terminal/PowerShell
 
 4. **Tell Claude to build your blog**:
    - Type this message into Claude Code and press Enter:
@@ -100,7 +108,7 @@ Your blog will be:
    ```
 
 5. **Answer a few questions**:
-   - Claude will ask for your blog name, repo name, etc.
+   - Claude will ask for your blog name, repository name (the name for your blog's storage on GitHub), etc.
    - Just type your answers and press Enter
    - Claude does everything else automatically
 
@@ -110,6 +118,8 @@ Your blog will be:
    - Deploys it to the internet
    - When done, Claude gives you your blog's web address
 
+   Once complete, your blog is live! You can close Terminal/PowerShell. The blog stays online - you don't need to keep anything running.
+
 ## How to Publish New Posts
 
 You have four options for publishing:
@@ -118,13 +128,17 @@ You have four options for publishing:
 
 1. **Write your post** in any text editor (Notes, TextEdit, etc.)
 
-2. **Open Claude Code** in Terminal:
+2. **Open Claude Code** in Terminal (Mac) or PowerShell (Windows):
+   - First, paste this line and press Enter:
    ```
    cd ~/Projects/my-blog
+   ```
+   - Then, paste this line and press Enter:
+   ```
    claude
    ```
 
-3. **Paste your post** into Claude Code and say "publish this"
+3. **Paste your post** into Claude Code and type exactly: "publish this"
 
 4. **Claude shows you a preview link** - click it to see how it looks
 
@@ -140,11 +154,12 @@ Your post is now live on your blog.
 
 2. **Open Claude Desktop** and start a new conversation
 
-3. **Tell Claude**:
+3. **Tell Claude** (replace the bracketed text with your actual post):
    ```
    I have a blog created with Blog in a Box at ~/Projects/my-blog
    Please publish this post: [paste your post here]
    ```
+   Example: "I have a blog created with Blog in a Box at ~/Projects/my-blog. Please publish this post: Today I learned about..."
 
 4. **Claude will**:
    - Ask for permission to access your Projects folder (approve this)
@@ -165,19 +180,20 @@ Note: The first time, you'll need to grant Claude access to your Projects folder
 3. **Connect to your blog's GitHub repository**:
    - Tap "Connect to GitHub" (first time only)
    - Sign in to GitHub and grant access
-   - Select your blog repository
+   - Select your blog repository (it will have the name you chose when creating your blog)
 
-4. **Write or paste your post**, then tell Claude:
+4. **Write or paste your post**, then tell Claude (replace the bracketed text with your actual post):
    ```
    Please publish this post: [your post text here]
    ```
+   Example: "Please publish this post: Today I learned about..."
 
 5. **Claude will**:
    - Create the post in your repository
    - Show you a preview link
    - Ask for approval before publishing
 
-This is great for publishing while on the go, without needing your Mac.
+This is great for publishing while on the go, without needing your computer.
 
 ### Option 4: Publish a Handwritten Post
 
@@ -222,6 +238,23 @@ But you can ask Claude to add them later if you need them!
 ## Need Help?
 
 If something goes wrong, copy the error message and paste it back to Claude Code. Claude will fix it.
+
+**Common questions:**
+- **Where's my blog URL?** Claude gave it to you when setup finished. If you lost it, open Terminal/PowerShell, type `cd ~/Projects/my-blog && cat .vercel-url` (if this file doesn't exist, ask Claude "what's my blog URL?")
+- **Can I change my blog name later?** Yes! Just ask Claude to update it.
+- **How do I see all my posts?** Go to your blog's home page - it lists all posts.
+
+## Security & Privacy
+
+**Remember**: Your blog is PUBLIC. Anyone on the internet can read it.
+
+**Never publish**:
+- Passwords or API keys
+- Private personal information (address, phone number, social security numbers, etc.)
+- Confidential business information
+- Anything you wouldn't want the whole world to see
+
+Always review the preview before publishing to make sure you're comfortable with the content going public.
 
 ## Disclaimer
 

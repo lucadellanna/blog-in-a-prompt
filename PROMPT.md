@@ -218,12 +218,14 @@ After you implement everything in this file and before declaring completion:
 1. Re-read this entire file and verify every requirement is satisfied
 2. Verify version pinning is correct in package.json (Section 2.4)
 3. Run: `npx skills add https://github.com/vercel-labs/agent-skills --skill vercel-react-best-practices`
-4. Run: `/vercel-react-best-practices`
-5. Run: `/code-review`
-6. Apply any fixes required by best-practices and code review, while preserving the MVP scope (no feature creep)
-7. **Create the required skills** from Section 2.3 using `/create-skill`
-8. **Test the `/publish` skill** by having it publish a second sample post
-9. **Validate production deployment** works as described in Section 2.4
+4. Run: `npx skills add https://github.com/vercel-labs/agent-skills --skill web-design-guidelines`
+5. Run: `/vercel-react-best-practices`
+6. Run: `/web-design-guidelines`
+7. Run: `/code-review`
+8. Apply any fixes required by best-practices, design guidelines, and code review, while preserving the MVP scope (no feature creep)
+9. **Create the required skills** from Section 2.3 using `/create-skill`
+10. **Test the `/publish` skill** by having it publish a second sample post
+11. **Validate production deployment** works as described in Section 2.4
 
 ---
 
@@ -730,11 +732,62 @@ You must verify all of the following are true:
 - Preview-first publishing flow is feasible and documented in README
 - You did not add excluded features
 
-Then do the completion hardening steps:
+Then do the completion hardening steps from Section 2.5:
 - Re-read this entire file and verify compliance
 - `npx skills add https://github.com/vercel-labs/agent-skills --skill vercel-react-best-practices`
+- `npx skills add https://github.com/vercel-labs/agent-skills --skill web-design-guidelines`
 - `/vercel-react-best-practices`
+- `/web-design-guidelines`
 - `/code-review`
 - Apply fixes without scope creep
+- Create the required skills from Section 2.3
+- Test the `/publish` skill
+- Validate production deployment
 
 Only then declare completion.
+
+---
+
+## 16. Completion Message to User
+
+After successfully completing all steps above, provide the user with this completion message:
+
+```
+🎉 Your blog is live!
+
+Production URL: [paste the actual production URL here]
+
+Your blog is now published and ready to use. Here's what you can do next:
+
+📝 **Publish a new post:**
+   Just paste your draft and say "publish this"
+   I'll handle everything: formatting, preview, and deployment
+
+✏️  **Edit the About page:**
+   Say "update my about page" and tell me what you'd like to change
+
+🔧 **Add features:**
+   Want to add images, analytics, or other features?
+   Just tell me what you'd like and I'll help you add it
+
+🏥 **Check blog health:**
+   Say "check my blog" anytime to verify everything is working
+
+📚 **Manage posts:**
+   - Edit existing posts: "edit the post about [topic]"
+   - View all posts: Visit your blog's home page
+   - Rollback if needed: "rollback to previous version"
+
+💡 **Tips:**
+   - Your blog repository is at: [GitHub repo URL]
+   - The `/publish` skill makes publishing easy
+   - All git operations happen automatically - you never need to run commands
+
+What would you like to do next?
+```
+
+**Important:**
+- Replace [production URL] and [GitHub repo URL] with actual values
+- Be warm and encouraging in tone
+- Give the user clear next steps
+- Make it obvious they can continue the conversation to publish or modify the blog

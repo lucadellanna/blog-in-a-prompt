@@ -65,6 +65,11 @@ Rules:
 - Minimize questions
 - Ask one question at a time
 - Do not ask the user to debug code
+- **When explaining errors to the user, use plain language**:
+  - Avoid technical jargon
+  - Explain what went wrong in simple terms
+  - Tell them what you're doing to fix it
+  - Example: Instead of "ENOENT error on package.json", say "I couldn't find a required file, so I'm creating it now"
 
 ### 2.2 Start-of-project initialization
 
@@ -80,7 +85,7 @@ Required rules docs (create these exact filenames):
 - `.claude/rules/03-cli-first.md`
 - `.claude/rules/04-project-structure.md`
 
-Each rules doc must be short, clear, and enforceable. Suggested contents are provided in Section 12.
+Each rules doc must be short, clear, and enforceable. Suggested contents are provided in Section 12 below.
 
 ### 2.3 Completion hardening steps (Mandatory)
 
@@ -276,7 +281,7 @@ AskUserQuestion:
 
 ### 8.2 Git operations
 
-The user should not run git commands manually.
+**CRITICAL: The user should NEVER run git commands manually. You must handle ALL git operations automatically and transparently.**
 
 You must:
 - initialize git (if not already)
@@ -285,6 +290,38 @@ You must:
 - add remote
 - push to main
 - If GitHub auth is required, guide the user through it (AskUserQuestion for confirmations), then resume
+
+**This applies to ALL git operations throughout the project lifecycle**, including:
+- Committing new posts
+- Pushing branches
+- Merging to main
+- Any other git operations
+
+Never ask the user to run git commands. Never tell the user "you need to commit" or "you need to push". Do it automatically.
+
+### 8.3 Troubleshooting git authentication
+
+If git operations fail due to authentication issues:
+
+**For HTTPS authentication errors:**
+- Explain to the user in plain language: "GitHub needs permission to let me access your account"
+- Guide them to create a Personal Access Token (classic) at https://github.com/settings/tokens
+- Needed scopes: `repo` (full control of private repositories)
+- Use AskUserQuestion to confirm they've created the token
+- Configure git to use the token with: `git remote set-url origin https://<token>@github.com/<username>/<repo>.git`
+
+**For SSH authentication errors:**
+- Check if SSH keys exist: `ls ~/.ssh/id_*.pub`
+- If no keys, guide user to: https://docs.github.com/en/authentication/connecting-to-github-with-ssh
+- Explain: "We need to set up a secure connection to GitHub. Please follow the link I'm showing you."
+- Use AskUserQuestion to confirm setup is complete before retrying
+
+**Recovery approach:**
+- Always try the operation first
+- If it fails, diagnose the specific auth issue
+- Explain the problem in simple terms
+- Provide one clear solution
+- Retry after user confirms
 
 ---
 
@@ -312,6 +349,25 @@ Trigger the first production deployment and obtain:
 - production URL
 - Confirm the site is live (at least by successful deploy output)
 
+**Vercel deployment troubleshooting:**
+
+If the deployment fails:
+1. **Check the build logs**: `vercel logs` or check the Vercel dashboard
+2. **Common build failures**:
+   - **Missing dependencies**: Add them to package.json and commit
+   - **TypeScript errors**: Fix type errors in the code
+   - **MDX parsing errors**: Verify MDX configuration in next.config.js
+   - **Environment mismatch**: Ensure Node version is compatible
+3. **Explain to the user**: Use plain language like "The website builder encountered an error. I'm fixing it now."
+4. **Fix and retry**: Make the necessary fixes, commit, push, and redeploy
+5. **Verify success**: Once deployed, visit the URL to confirm it's working
+
+**If deployment succeeds but site doesn't work:**
+- Visit the production URL yourself (simulate checking)
+- Check for runtime errors in Vercel logs
+- Common issues: missing environment variables, incorrect file paths, API route problems
+- Fix and redeploy as needed
+
 ---
 
 ## 10. Publishing Workflow (Core Feature)
@@ -320,13 +376,17 @@ You must establish and follow this publishing protocol.
 
 ### 10.1 When the user provides a draft
 
-Do all steps yourself:
-- Normalize the draft (clean formatting, headings, spacing)
-- Create front matter: `title` (derived or proposed), `date` (today unless user specifies otherwise)
-- Create filename: `YYYY-MM-DD-kebab-case-title.mdx`
-- Create a new git branch: `post/YYYY-MM-DD-kebab-case-title`
-- Write file to: `content/posts/<filename>`
-- Commit and push branch to GitHub
+**Do all steps yourself automatically. Never ask the user to run any commands.**
+
+1. Normalize the draft (clean formatting, headings, spacing)
+2. Create front matter: `title` (derived or proposed), `date` (today unless user specifies otherwise)
+3. Create filename: `YYYY-MM-DD-kebab-case-title.mdx`
+4. Create a new git branch: `post/YYYY-MM-DD-kebab-case-title`
+5. Write file to: `content/posts/<filename>`
+6. **Automatically commit the new file with a descriptive commit message**
+7. **Automatically push the branch to GitHub**
+
+All git operations must be transparent to the user. They should never see git commands or be asked to run them.
 
 ### 10.2 Preview deployment
 
@@ -334,14 +394,37 @@ Obtain a preview URL using the Vercel + Git integration (preferred).
 
 If previews are not automatically available, you may deploy a preview via CLI and provide that URL, but still keep the branch-based flow.
 
+**If preview deployment fails:**
+1. Check Vercel deployment logs: `vercel logs <deployment-url>`
+2. Common issues:
+   - **Build errors**: Check that all dependencies are in package.json, run `npm install` locally to verify
+   - **Environment variables**: Vercel deployments may need env vars set via `vercel env` or dashboard
+   - **Vercel connection issues**: Ensure the Vercel project is properly linked to the GitHub repo
+3. Explain the issue to the user in plain language
+4. Fix the underlying problem (e.g., add missing dependencies, configure env vars)
+5. Retry the deployment
+6. If unable to resolve automatically, provide clear instructions for what the user needs to do
+
+**Fallback:**
+- If preview deployment repeatedly fails, you may proceed with showing the user the post content directly in the conversation
+- Ask approval based on the content you show them
+- Then merge to main and deploy to production
+- Inform the user: "I couldn't create a preview, but here's what the post will look like. Should I publish it?"
+
 ### 10.3 Approval gate (Mandatory)
 
 AskUserQuestion (single question):
 "Publish to production? (yes/no)"
 
 Rules:
-- If "no": do not merge, do not deploy production
-- If "yes": merge branch to main (via git / GitHub), then confirm production is updated
+- If "no": do not merge, do not deploy production, leave the branch as-is
+- If "yes":
+  - **Automatically merge the branch to main** (using git commands yourself)
+  - **Automatically push to GitHub**
+  - Wait for Vercel to deploy
+  - Confirm production is updated and provide the production URL
+
+**All git operations must be automatic.** Never tell the user to "merge the branch" or "push to main" - do it yourself.
 
 ---
 
@@ -400,6 +483,8 @@ Include:
 - Do as much as possible yourself
 - Ask the user only for unavoidable auth/account steps
 - Never ask the user to edit code manually
+- **Never ask the user to run git commands - handle all commits, pushes, merges, and branches automatically**
+- The user should never see or interact with git - it should be completely transparent
 
 ### 12.5 .claude/rules/04-project-structure.md
 
@@ -411,7 +496,69 @@ Include:
 
 ---
 
-## 13. README Requirements (Minimal)
+## 13. Error Handling and User Communication
+
+### 13.1 General principles for error handling
+
+When anything goes wrong:
+
+1. **Never show raw error messages to the user**
+   - Bad: "Error: ECONNREFUSED 127.0.0.1:3000"
+   - Good: "I couldn't start the local server. Let me try again with a different port."
+
+2. **Explain what happened in plain language**
+   - Bad: "Git push rejected due to non-fast-forward"
+   - Good: "Someone else made changes to your blog. I'm updating your local copy first, then I'll try again."
+
+3. **Tell them what you're doing to fix it**
+   - Always include: "I'm [fixing/retrying/updating] now..."
+   - This reassures them you're handling it
+
+4. **Only involve the user when absolutely necessary**
+   - Fix 90% of issues yourself automatically
+   - Only ask for help with things you can't do (like creating accounts, auth tokens, DNS settings)
+
+5. **When you need user action, be specific**
+   - Bad: "Please fix your GitHub authentication"
+   - Good: "I need you to create a GitHub access token. Please visit this link: [URL]. I'll wait here and we can continue when you're ready."
+
+### 13.2 Common error scenarios
+
+**Port already in use (dev server):**
+- Solution: Use a different port automatically (`npm run dev -- -p 3001`)
+- Tell user: "Port 3000 was busy, so I started the server on port 3001 instead."
+
+**Package installation failures:**
+- Solution: Clear cache and retry: `rm -rf node_modules package-lock.json && npm install`
+- Tell user: "Had trouble installing dependencies. Cleaning up and trying again..."
+
+**Vercel CLI not found:**
+- Solution: Install it: `npm install -g vercel`
+- Tell user: "Installing the Vercel tool I need to deploy your blog..."
+
+**GitHub rate limits:**
+- Solution: Wait and retry, or ask user to authenticate
+- Tell user: "GitHub is asking me to slow down. Waiting 60 seconds before continuing..."
+
+**File permission errors:**
+- Solution: Check file paths, use proper permissions
+- Tell user: "I don't have permission to write to that location. Using a different folder..."
+
+### 13.3 Recovery strategies
+
+Always attempt automatic recovery before involving the user:
+
+1. **Retry with backoff**: For network errors, retry 2-3 times with increasing delays
+2. **Alternative approaches**: If one method fails, try another (e.g., HTTPS vs SSH for git)
+3. **Graceful degradation**: If preview fails, show content directly and proceed
+4. **Clear state and retry**: For dependency/cache issues, clean and reinstall
+5. **Use defaults**: When configuration is ambiguous, pick sensible defaults and proceed
+
+**Only escalate to user when:**
+- Authentication/credentials needed (can't automate)
+- External service is down (can't fix)
+- User needs to make a decision (domain name, blog title, etc.)
+- Issue persists after 3 automatic retry attempts
 
 Write a short README that includes:
 - What this is
@@ -424,10 +571,10 @@ Do not over-document.
 
 ---
 
-## 14. Final Checklist Before Declaring Completion
+## 15. Final Checklist Before Declaring Completion
 
 You must verify all of the following are true:
-- Project structure matches Section 4 exactly
+- Project structure matches Section 4 (Required Project Structure) exactly
 - `/about` exists, is linked in nav, and renders from `content/pages/about.mdx`
 - Home page lists posts newest-first
 - Post pages render MDX from `content/posts/`

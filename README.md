@@ -263,3 +263,7 @@ This is provided as-is. The creator is not responsible for any issues, costs, or
 ---
 
 For any questions, contact me at [Luca-Dellanna.com/contact](https://Luca-Dellanna.com/contact)
+
+## About the Author
+
+I'm Luca Dellanna ([Luca-Dellanna.com](https://Luca-Dellanna.com)), an independent management consultant helping businesses nail change initiatives (including AI) and the author of several books ([Luca-Dellanna.com/books](https://Luca-Dellanna.com/books)).

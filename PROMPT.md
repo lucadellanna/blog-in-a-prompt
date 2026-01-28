@@ -250,10 +250,10 @@ To ensure the blog remains working over time:
 ```json
 {
   "dependencies": {
-    "next": "^14.0.0 || ^15.0.0",
+    "next": "^14.0.0",
     "react": "^18.0.0",
     "react-dom": "^18.0.0",
-    "@next/mdx": "^14.0.0 || ^15.0.0",
+    "@next/mdx": "^14.0.0",
     "@mdx-js/loader": "^3.0.0",
     "@mdx-js/react": "^3.0.0"
   },
@@ -539,8 +539,11 @@ If git operations fail due to authentication issues:
 
 **For HTTPS authentication errors:**
 - Explain to the user in plain language: "GitHub needs permission to let me access your account"
-- Guide them to create a Personal Access Token (classic) at https://github.com/settings/tokens
-- Needed scopes: `repo` (full control of private repositories)
+- Guide them to create a fine-grained Personal Access Token at https://github.com/settings/tokens?type=beta
+- Instruct them to:
+  - Select the target repository (the blog repo you're creating)
+  - Under "Repository permissions", grant "Read and write" access for "Contents"
+  - This is more secure than classic tokens as it limits access to only this repository
 - Use AskUserQuestion to confirm they've created the token
 - Configure git to use the token with: `git remote set-url origin https://<token>@github.com/<username>/<repo>.git`
 
@@ -826,14 +829,20 @@ Always attempt automatic recovery before involving the user:
 - User needs to make a decision (domain name, blog title, etc.)
 - Issue persists after 3 automatic retry attempts
 
-Write a short README that includes:
-- What this is
+---
+
+## 14. Project README (For the Generated Blog)
+
+After creating the blog project, write a short project README in the blog directory that includes:
+- What this blog is (personal blog built with Blog in a Box)
 - How to run locally (npm install, npm run dev)
 - How publishing works (draft to agent → preview → approval)
-- Where content files live
+- Where content files live (content/posts/, content/pages/)
 - What is intentionally excluded (no tags, images, SEO, analytics, comments)
 
-Do not over-document.
+Do not over-document. Keep it concise and focused on helping future contributors understand the project.
+
+**Note:** This is separate from the Blog in a Box user guide README (which already exists in the main repo). This README is for the generated blog project itself.
 
 ---
 

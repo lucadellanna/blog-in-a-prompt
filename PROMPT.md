@@ -77,7 +77,7 @@ Rules:
 At the beginning, do all of this:
 1. Run `/init`
 2. Create `.claude/rules/` and write a few short rules docs that extract the enforceable constraints from this file
-3. Create `.claude/skills/` and add essential blog management skills (see Section 2.4 below)
+3. Create `.claude/skills/` and add essential blog management skills (see Section 2.3 below)
 4. Create `CLAUDE.md` with project-specific instructions (see below)
 
 Required rules docs (create these exact filenames):
@@ -545,7 +545,12 @@ If git operations fail due to authentication issues:
   - Under "Repository permissions", grant "Read and write" access for "Contents"
   - This is more secure than classic tokens as it limits access to only this repository
 - Use AskUserQuestion to confirm they've created the token
-- Configure git to use the token with: `git remote set-url origin https://<token>@github.com/<username>/<repo>.git`
+- Configure git to cache credentials securely:
+  - Run: `git config credential.helper cache` (caches in memory temporarily)
+  - Run: `git push` - when prompted for username, provide their GitHub username
+  - When prompted for password, provide the token
+  - Git will cache these credentials in memory (not on disk) for the session
+  - This is more secure than storing the token in `.git/config`
 
 **For SSH authentication errors:**
 - Check if SSH keys exist: `ls ~/.ssh/id_*.pub`

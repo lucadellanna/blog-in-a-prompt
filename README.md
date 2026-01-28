@@ -240,7 +240,7 @@ But you can ask Claude to add them later if you need them!
 If something goes wrong, copy the error message and paste it back to Claude Code. Claude will fix it.
 
 **Common questions:**
-- **Where's my blog URL?** Claude gave it to you when setup finished. If you lost it, open Terminal/PowerShell, type `cd ~/Projects/my-blog && cat .vercel-url` (if this file doesn't exist, ask Claude "what's my blog URL?")
+- **Where's my blog URL?** Claude gave it to you when setup finished. If you lost it, you can find it by opening the `.vercel-url` file inside your `my-blog` project folder. You can also ask Claude "what's my blog URL?"
 - **Can I change my blog name later?** Yes! Just ask Claude to update it.
 - **How do I see all my posts?** Go to your blog's home page - it lists all posts.
 
@@ -262,7 +262,7 @@ This is provided as-is. The creator is not responsible for any issues, costs, or
 
 ---
 
-For any questions, contact me at [Luca-Dellanna.com/contact](https://Luca-Dellanna.com/contact)
+For any questions, contact me at [Luca-Dellanna.com/contact](https://www.luca-dellanna.com/contact/)
 
 ## About the Author
 

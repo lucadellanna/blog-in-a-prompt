@@ -76,6 +76,7 @@ Rules:
 At the beginning, do all of this:
 1. Run `/init`
 2. Create `.claude/rules/` and write a few short rules docs that extract the enforceable constraints from this file
+3. Create `.claude/skills/` and add essential blog management skills (see Section 2.4 below)
 
 Required rules docs (create these exact filenames):
 
@@ -87,14 +88,142 @@ Required rules docs (create these exact filenames):
 
 Each rules doc must be short, clear, and enforceable. Suggested contents are provided in Section 12 below.
 
-### 2.3 Completion hardening steps (Mandatory)
+### 2.3 Required skills (Create after initial setup completes)
+
+After the blog is successfully deployed, create these skills in `.claude/skills/`:
+
+**`.claude/skills/publish.md`** (CRITICAL):
+```markdown
+# Publish Blog Post
+
+Publish a blog post from draft to production.
+
+## Trigger phrases
+- "publish this"
+- "publish this post"
+- "add this to my blog"
+
+## What this skill does
+1. Extracts draft content from conversation
+2. Follows Section 10 publishing workflow exactly
+3. Handles all git operations automatically
+4. Provides preview URL
+5. Gates on user approval
+6. Merges to main and deploys to production
+7. Confirms production URL is live
+
+## Important
+- Never skip the preview step
+- Never merge without explicit approval
+- All git operations must be transparent to user
+```
+
+**`.claude/skills/blog-health.md`** (RECOMMENDED):
+```markdown
+# Blog Health Check
+
+Diagnose and fix common blog issues.
+
+## Trigger phrases
+- "check my blog"
+- "is my blog working"
+- "diagnose blog issues"
+
+## What this skill does
+1. Checks production URL is accessible (HTTP 200)
+2. Verifies posts render correctly (sample 2-3 posts)
+3. Checks Vercel deployment status
+4. Validates GitHub repo is in sync
+5. Reports any issues found
+6. Offers to fix problems automatically
+
+## Common fixes
+- Redeploy if production is stale
+- Fix broken builds
+- Sync git repo if out of sync
+```
+
+**`.claude/skills/rollback.md`** (RECOMMENDED):
+```markdown
+# Rollback Deployment
+
+Rollback to a previous working deployment if something breaks.
+
+## Trigger phrases
+- "rollback"
+- "undo that deployment"
+- "revert to previous version"
+
+## What this skill does
+1. Lists recent Vercel deployments (vercel list)
+2. Shows user the last 5 deployments with timestamps
+3. Asks which to rollback to
+4. Uses Vercel CLI to promote previous deployment
+5. Verifies rollback succeeded
+6. Provides restored production URL
+
+## Important
+- Always show deployment list before rolling back
+- Confirm with user before promoting old deployment
+- Verify the rolled-back version works
+```
+
+**When to create these skills:**
+- Create them immediately after first successful production deployment
+- Use the `/create-skill` command for each
+- Test the `/publish` skill by creating a second sample post
+
+### 2.4 Version pinning and compatibility (Reduce brittleness)
+
+To ensure the blog remains working over time:
+
+**Pin critical dependencies in package.json:**
+```json
+{
+  "dependencies": {
+    "next": "^14.0.0 || ^15.0.0",
+    "react": "^18.0.0",
+    "react-dom": "^18.0.0",
+    "@next/mdx": "^14.0.0 || ^15.0.0",
+    "@mdx-js/loader": "^3.0.0",
+    "@mdx-js/react": "^3.0.0"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  }
+}
+```
+
+**Validate tooling versions before critical operations:**
+- Before running vercel commands, check version: `vercel --version`
+- If Vercel CLI < 28.0.0, warn user and suggest upgrade: `npm install -g vercel@latest`
+- Document the versions used in a comment in project README for future reference
+
+**GitHub authentication preference:**
+- Default to HTTPS with Personal Access Token (simpler for non-technical users)
+- Only suggest SSH if HTTPS fails repeatedly
+- Document which auth method was used in `.claude/config.json` for consistency across sessions
+
+**Deployment validation (reduce broken deployments):**
+After every production deployment:
+1. Wait 30 seconds for Vercel to finish building
+2. Fetch the production URL with curl or similar: `curl -I <production-url>`
+3. Verify HTTP 200 response
+4. If non-200, check Vercel logs and fix issues before declaring success
+5. Optionally visit `<production-url>/posts/<latest-post-slug>` to verify latest post renders
+
+### 2.5 Completion hardening steps (Mandatory)
 
 After you implement everything in this file and before declaring completion:
 1. Re-read this entire file and verify every requirement is satisfied
-2. Run: `npx skills add https://github.com/vercel-labs/agent-skills --skill vercel-react-best-practices`
-3. Run: `/vercel-react-best-practices`
-4. Run: `/code-review`
-5. Apply any fixes required by best-practices and code review, while preserving the MVP scope (no feature creep)
+2. Verify version pinning is correct in package.json (Section 2.4)
+3. Run: `npx skills add https://github.com/vercel-labs/agent-skills --skill vercel-react-best-practices`
+4. Run: `/vercel-react-best-practices`
+5. Run: `/code-review`
+6. Apply any fixes required by best-practices and code review, while preserving the MVP scope (no feature creep)
+7. **Create the required skills** from Section 2.3 using `/create-skill`
+8. **Test the `/publish` skill** by having it publish a second sample post
+9. **Validate production deployment** works as described in Section 2.4
 
 ---
 
@@ -342,6 +471,23 @@ Prefer connecting Vercel to the GitHub repo so that:
 - Vercel creates preview deployments for branches/PRs
 - Production deployment tracks main
 - Use CLI capabilities as much as possible. Only fall back to dashboard steps if strictly necessary
+
+**Critical: Verify GitHub-Vercel integration**
+
+After linking the project, verify the integration is working:
+1. Run `vercel git connect` or check connection status
+2. Verify with: `vercel inspect` - should show "Connected Git Repository"
+3. If not connected:
+   - Guide user to Vercel dashboard > Project Settings > Git
+   - Confirm GitHub repo is linked
+   - Use AskUserQuestion to confirm connection is established
+4. **Test the integration:**
+   - Create a test branch: `git checkout -b test-vercel-integration`
+   - Make a trivial commit: `echo "test" > .vercel-test && git add . && git commit -m "test vercel integration"`
+   - Push: `git push -u origin test-vercel-integration`
+   - Check if Vercel created a preview deployment: `vercel list`
+   - If preview appears, integration is working - clean up test branch
+   - If no preview, troubleshoot integration before proceeding
 
 ### 9.3 First production deployment
 

@@ -65,6 +65,7 @@ Rules:
 - Minimize questions
 - Ask one question at a time
 - Do not ask the user to debug code
+- **Interpreting responses:** Treat "yes", "yeah", "sure", "ok", "yep", "sounds good" as affirmative. Treat "no", "nope", "nah" as negative. If ambiguous, ask for clarification.
 - **When explaining errors to the user, use plain language**:
   - Avoid technical jargon
   - Explain what went wrong in simple terms
@@ -236,9 +237,10 @@ Rollback to a previous working deployment if something breaks.
 ```
 
 **When to create these skills:**
-- Create them immediately after first successful production deployment
+- Create them during the completion hardening steps (Section 2.5 step 9)
+- This happens AFTER production deployment succeeds but BEFORE showing the completion message to the user
 - Use the `/create-skill` command for each
-- Test the `/publish` skill by creating a second sample post
+- Test the `/publish` skill by having it create (but not publish to production) a second sample post - verify the workflow works
 
 ### 2.4 Version pinning and compatibility (Reduce brittleness)
 
@@ -408,11 +410,25 @@ Rules:
 
 ## 7. Implementation Plan (Do This, Do Not Ask the User To Do It)
 
+### 7.0 Gather required information
+
+Before implementing, ask the user for these required details (use AskUserQuestion):
+
+1. **Blog title**: "What would you like to name your blog?"
+   - This will be displayed in the navigation
+   - Example: "Jane's Tech Blog", "Daily Thoughts", etc.
+
+2. **Repository name**: Suggest a kebab-case version of the blog title
+   - Example: if blog title is "Jane's Tech Blog" → suggest "janes-tech-blog"
+   - Use AskUserQuestion: "I'll create a GitHub repository called '[suggestion]'. Is that okay, or would you prefer a different name?"
+
+Store these values to use throughout the setup process.
+
 ### 7.1 Choose project folder
 
 - If user is in an empty folder, proceed
-- If not, create a new folder
-- Use AskUserQuestion only if you must choose a folder name
+- If not, create a new folder in ~/Projects with the repository name
+- Use the folder name from the repository name decided above
 
 ### 7.2 Preflight checks (agent does the checking)
 
@@ -421,12 +437,26 @@ Rules:
 - Confirm git exists
 - If something is missing, provide one short instruction to the user to install it, then continue when available
 
-### 7.3 Scaffold Next.js app (no templates, no starters)
+### 7.3 Scaffold Next.js app
 
-Create a minimal Next.js app (App Router). Do not clone starters.
+Create a Next.js app using the official CLI:
+
+```bash
+npx create-next-app@latest . --typescript --tailwind --app --no-src-dir --import-alias "@/*"
+```
+
+**Important:** Use the `.` to install in the current directory.
+
+If prompted interactively, answer:
+- Would you like to use TypeScript? → Yes
+- Would you like to use ESLint? → Yes
+- Would you like to use Tailwind CSS? → Yes
+- Would you like to use `src/` directory? → No
+- Would you like to use App Router? → Yes
+- Would you like to customize the default import alias? → No
 
 Then implement:
-- MDX support
+- MDX support (next section)
 - The required routes and file structure
 - A minimal MDX loader using the filesystem at build/runtime on the server (no database)
 
@@ -482,7 +512,13 @@ AskUserQuestion:
 **CRITICAL: The user should NEVER run git commands manually. You must handle ALL git operations automatically and transparently.**
 
 You must:
-- initialize git (if not already)
+- initialize git (if not already): `git init`
+- **configure git identity** (required for commits):
+  ```bash
+  git config user.name "Blog Author"
+  git config user.email "noreply@example.com"
+  ```
+  (Use generic values - user can change later if needed)
 - commit the scaffold
 - create the GitHub repo
 - add remote
@@ -527,12 +563,16 @@ If git operations fail due to authentication issues:
 
 ### 9.1 Vercel authentication
 
-Use the Vercel CLI.
+**First, ensure Vercel CLI is installed:**
+- Check if vercel exists: `which vercel` (Mac/Linux) or `where vercel` (Windows)
+- If not found, install it: `npm install -g vercel`
+- Wait for installation to complete
 
-If not logged in:
+**Then authenticate:**
 - Run `vercel login`
-- AskUserQuestion to confirm the user completed the login flow in the browser
-- Continue
+- This will open a browser window for the user to log in
+- Use AskUserQuestion to confirm: "I've opened a browser window for you to log into Vercel. Please log in and then let me know when you're done."
+- Wait for user confirmation, then continue
 
 ### 9.2 Create/link the Vercel project
 
@@ -563,6 +603,12 @@ After linking the project, verify the integration is working:
 Trigger the first production deployment and obtain:
 - production URL
 - Confirm the site is live (at least by successful deploy output)
+
+**Save the production URL for the user:**
+- Create a file `.vercel-url` in the project root
+- Write the production URL to this file
+- This allows the user to easily find their blog URL later
+- Example: `echo "https://my-blog.vercel.app" > .vercel-url`
 
 **Vercel deployment troubleshooting:**
 
@@ -608,6 +654,11 @@ All git operations must be transparent to the user. They should never see git co
 Obtain a preview URL using the Vercel + Git integration (preferred).
 
 If previews are not automatically available, you may deploy a preview via CLI and provide that URL, but still keep the branch-based flow.
+
+**Timeout handling:**
+- Wait up to 2 minutes for Vercel to create the preview deployment
+- Check status with: `vercel list` or check the GitHub PR (if integration is working)
+- If preview isn't ready after 2 minutes, check Vercel dashboard or logs for issues
 
 **If preview deployment fails:**
 1. Check Vercel deployment logs: `vercel logs <deployment-url>`

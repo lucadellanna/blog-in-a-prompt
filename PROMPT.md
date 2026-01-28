@@ -77,6 +77,7 @@ At the beginning, do all of this:
 1. Run `/init`
 2. Create `.claude/rules/` and write a few short rules docs that extract the enforceable constraints from this file
 3. Create `.claude/skills/` and add essential blog management skills (see Section 2.4 below)
+4. Create `CLAUDE.md` with project-specific instructions (see below)
 
 Required rules docs (create these exact filenames):
 
@@ -87,6 +88,72 @@ Required rules docs (create these exact filenames):
 - `.claude/rules/04-project-structure.md`
 
 Each rules doc must be short, clear, and enforceable. Suggested contents are provided in Section 12 below.
+
+**CLAUDE.md requirements:**
+
+Create a `CLAUDE.md` file in the project root with these exact contents:
+
+```markdown
+# Blog Management Instructions
+
+This is a personal blog built with Blog in a Box. Keep all interactions simple and non-technical.
+
+## Core Principles
+
+1. **Always use the simplest language possible**
+   - Never assume technical expertise
+   - Explain what you're doing in plain terms
+   - Avoid jargon (git, repo, deploy, CLI, etc.)
+   - Example: Say "publishing your post" not "deploying to production"
+
+2. **Do as much as possible automatically**
+   - Never ask the user to run commands
+   - Handle all git operations transparently
+   - Fix issues yourself before asking for help
+   - Only involve user for decisions (content, approval) and unavoidable auth steps
+
+3. **Keep responses concise**
+   - Be brief and actionable
+   - Don't over-explain technical details
+   - Focus on what the user needs to know, not how it works internally
+
+## Publishing Workflow
+
+When user provides a blog post draft:
+- Use the `/publish` skill automatically
+- Follow Section 10 of PROMPT.md exactly
+- Show preview, wait for approval, then publish
+- All git operations must be invisible to user
+
+## Common User Requests
+
+- "publish this" → Use `/publish` skill
+- "check my blog" → Use `/blog-health` skill
+- "update my about page" → Edit content/pages/about.mdx, follow publishing workflow
+- "rollback" → Use `/rollback` skill
+
+## Technical Constraints
+
+- This is a minimal MVP: no images, tags, SEO fields, analytics, comments
+- Content format: Markdown (treated as MDX)
+- Post front matter: only `title` and `date` allowed
+- All posts under `content/posts/`
+- About page at `content/pages/about.mdx`
+
+## Important Reminders
+
+- Never skip the preview step when publishing
+- Never merge to production without explicit user approval
+- All git commands must be automatic and transparent
+- Use plain language in all user communication
+- Keep the MVP scope - no feature creep without explicit user request
+```
+
+**Why this matters:**
+- Ensures consistent non-technical communication across all future Claude sessions
+- Reinforces the "do it for them" philosophy
+- Keeps the project maintainable by documenting core constraints
+- **CRITICAL**: This file will be read by future Claude instances, so it must be clear and actionable
 
 ### 2.3 Required skills (Create after initial setup completes)
 

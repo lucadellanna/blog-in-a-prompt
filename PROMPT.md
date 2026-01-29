@@ -74,19 +74,21 @@ Rules:
 
 ### 2.2 Start-of-project initialization
 
-At the beginning, do all of this:
-1. Run `/init`
-2. Create `.claude/rules/` and write a few short rules docs that extract the enforceable constraints from this file
-3. Create `.claude/skills/` and add essential blog management skills (see Section 2.3 below)
-4. Create `CLAUDE.md` with project-specific instructions (see below)
+At the beginning, do all of this **in this exact order** (scaffolding must happen first because `create-next-app` requires an empty directory):
+
+1. **Scaffold the Next.js app first** (see Section 7.3) — this must happen before creating any files
+2. Run `/init`
+3. Create `.claude/rules/` and write a few short rules docs that extract the enforceable constraints from this file
+4. Create `.claude/skills/` and add essential blog management skills (see Section 2.3 below)
+5. Create `CLAUDE.md` with project-specific instructions (see below)
 
 Required rules docs (create these exact filenames):
 
-- `.claude/rules/00-scope.md`
-- `.claude/rules/01-content-contract.md`
-- `.claude/rules/02-publishing-flow.md`
-- `.claude/rules/03-cli-first.md`
-- `.claude/rules/04-project-structure.md`
+- `.claude/rules/scope.md`
+- `.claude/rules/content-contract.md`
+- `.claude/rules/publishing-flow.md`
+- `.claude/rules/cli-first.md`
+- `.claude/rules/project-structure.md`
 
 Each rules doc must be short, clear, and enforceable. Suggested contents are provided in Section 12 below.
 
@@ -723,7 +725,7 @@ If no:
 
 Create `.claude/rules/` and write the following.
 
-### 12.1 .claude/rules/00-scope.md
+### 12.1 .claude/rules/scope.md
 
 Include:
 - This is a minimal text-only blog
@@ -731,7 +733,7 @@ Include:
 - Keep implementation boring and minimal
 - Do not add features beyond scope
 
-### 12.2 .claude/rules/01-content-contract.md
+### 12.2 .claude/rules/content-contract.md
 
 Include:
 - Posts are MDX but treated as Markdown
@@ -740,7 +742,7 @@ Include:
 - Slug derived from filename
 - About page mandatory from `content/pages/about.mdx`
 
-### 12.3 .claude/rules/02-publishing-flow.md
+### 12.3 .claude/rules/publishing-flow.md
 
 Include:
 - Draft → Preview → explicit approval → merge → production
@@ -748,7 +750,7 @@ Include:
 - Use AskUserQuestion for approval gate
 - Leave branch if user says "no"
 
-### 12.4 .claude/rules/03-cli-first.md
+### 12.4 .claude/rules/cli-first.md
 
 Include:
 - Prefer CLI for git, GitHub, Vercel
@@ -758,7 +760,7 @@ Include:
 - **Never ask the user to run git commands - handle all commits, pushes, merges, and branches automatically**
 - The user should never see or interact with git - it should be completely transparent
 
-### 12.5 .claude/rules/04-project-structure.md
+### 12.5 .claude/rules/project-structure.md
 
 Include:
 - Enforce the required folder structure

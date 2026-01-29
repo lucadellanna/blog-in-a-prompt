@@ -223,7 +223,7 @@ Check for these signs that the blog is already set up:
 
 **Possible signals (could also be a fresh clone):**
 - `content/posts/` has posts beyond the sample "Hello World"
-- `content/pages/about.mdx` exists and has real content
+- `content/pages/about.mdx` exists and contains content beyond frontmatter
 
 **Not sufficient on their own (these can exist in a fresh clone):**
 - `.git` directory exists (even with a remote configured)
@@ -288,11 +288,11 @@ If the workflow requires creating a PR (e.g., for team review or complex changes
 When the user asks for visual changes (colors, fonts, layout, hero section, etc.):
 
 1. Make the code changes locally
-2. Start the dev server: `npm run dev`
+2. Start the dev server in the background and save its process ID (PID), e.g., `npm run dev &` (PID is `$!`)
 3. Tell the user: "I've made the changes. You can preview them now at http://localhost:3000 - this is a private preview on your computer. Take a look and let me know if you'd like any adjustments."
 4. Wait for feedback and iterate locally (no deploy needed for each tweak)
 5. Once they're happy, publish the changes to the live site
-6. Stop the dev server when done
+6. Stop the dev server using its PID when done, e.g., `kill <PID>`
 
 This is faster than waiting on Vercel previews for every small change. For anything you want to make live (new posts or permanent updates), follow the normal preview-then-publish workflow.
 

@@ -1006,7 +1006,7 @@ AskUserQuestion:
 2. Create your first real blog post
 3. Connect a custom domain (like yourname.com)
 4. Add a hero section to the homepage
-5. Make it look like another blog you admire
+5. Use colors and fonts from a blog you admire
 6. Improve the visual appearance (colors, fonts, etc.)
 7. Something else (tell me what!)
 8. Nothing for now - I'll explore on my own"
@@ -1016,7 +1016,7 @@ AskUserQuestion:
 - **Create first post**: Ask for their draft content, then follow Section 10 publishing workflow
 - **Custom domain**: Follow Section 11 to guide them through DNS setup
 - **Add hero section**: Ask what they want in the hero (headline, tagline, call-to-action) and add a simple hero component above the post list
-- **Look like another blog**: Ask for the URL of the blog they admire, analyze its visual style (colors, typography, layout), and adapt those elements to their blog while staying within MVP scope
+- **Use colors and fonts from another blog**: Ask for the URL of the blog they admire, extract its color palette and typography choices, and apply them to their blog while staying within MVP scope (layout changes are not included)
 - **Improve visuals**: Ask what they'd like to change (colors, fonts, layout) and implement within MVP scope
 - **Something else**: Listen to their request and help if within scope
 - **Nothing for now**: Proceed to completion message

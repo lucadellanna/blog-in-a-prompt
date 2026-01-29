@@ -161,7 +161,7 @@ Create a `CLAUDE.md` file in the project root with these exact contents:
 ```markdown
 # Blog Management Instructions
 
-This is a personal blog built with Blog in a Box. Keep all interactions simple and non-technical.
+This is a personal blog built with Blog in a Prompt. Keep all interactions simple and non-technical.
 
 ## Core Principles
 
@@ -959,7 +959,7 @@ Always attempt automatic recovery before involving the user:
 ## 14. Project README (For the Generated Blog)
 
 After creating the blog project, write a short project README in the blog directory that includes:
-- What this blog is (personal blog built with Blog in a Box)
+- What this blog is (personal blog built with Blog in a Prompt)
 - How to run locally (npm install, npm run dev)
 - How publishing works (draft to agent → preview → approval)
 - Where content files live (content/posts/, content/pages/)
@@ -967,7 +967,7 @@ After creating the blog project, write a short project README in the blog direct
 
 Do not over-document. Keep it concise and focused on helping future contributors understand the project.
 
-**Note:** This is separate from the Blog in a Box user guide README (which already exists in the main repo). This README is for the generated blog project itself.
+**Note:** This is separate from the Blog in a Prompt user guide README (which already exists in the main repo). This README is for the generated blog project itself.
 
 ---
 

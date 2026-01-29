@@ -1,4 +1,4 @@
-# Blog in a Box - Project Instructions
+# Blog in a Prompt - Project Instructions
 
 This project contains the "Blog in a Prompt" template for creating personal blogs with Claude Code.
 
@@ -13,4 +13,5 @@ This project contains the "Blog in a Prompt" template for creating personal blog
 
 - `PROMPT.md` - The main template that Claude Code reads to create a blog
 - `README.md` - User-facing instructions for creating their blog
-- `.claude/skills/` - Project-specific skills for maintaining this template
+- `.claude/skills/review-readme/` - Skill for reviewing README.md for accuracy and clarity
+- `.claude/skills/review-prompt/` - Skill for reviewing PROMPT.md for correctness and executability

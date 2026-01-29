@@ -1,10 +1,10 @@
-# Blog in a Box - Your Personal Blog, Built by AI
+# Blog in a Prompt - Your Personal Blog, Built by AI
 
 Get your own blog online in 30 minutes. No coding required.
 
 ## What This Does
 
-Blog in a Box gives you a live blog website where you can publish your writing. An AI assistant (Claude) builds and manages everything for you. You just write and click "publish."
+Blog in a Prompt gives you a live blog website where you can publish your writing. An AI assistant (Claude) builds and manages everything for you. You just write and click "publish."
 
 Your blog will be:
 - Live on the internet with its own web address
@@ -88,14 +88,14 @@ You'll use these accounts during the blog setup process.
    ```bash
    mkdir -p ~/Projects/my-blog
    cd ~/Projects/my-blog
-   curl -o PROMPT.md https://raw.githubusercontent.com/lucadellanna/blog-in-a-box/main/PROMPT.md
+   curl -o PROMPT.md https://raw.githubusercontent.com/lucadellanna/blog-in-a-prompt/main/PROMPT.md
    ```
 
    **On Windows (in PowerShell):**
    ```powershell
    New-Item -Path "$HOME/Projects/my-blog" -ItemType Directory -Force
    cd "$HOME/Projects/my-blog"
-   curl.exe -o PROMPT.md https://raw.githubusercontent.com/lucadellanna/blog-in-a-box/main/PROMPT.md
+   curl.exe -o PROMPT.md https://raw.githubusercontent.com/lucadellanna/blog-in-a-prompt/main/PROMPT.md
    ```
 
    This downloads the instructions that Claude will follow to build your blog.
@@ -162,10 +162,10 @@ Your post is now live on your blog.
 
 3. **Tell Claude** (replace the bracketed text with your actual post):
    ```
-   I have a blog created with Blog in a Box at ~/Projects/my-blog
+   I have a blog created with Blog in a Prompt at ~/Projects/my-blog
    Please publish this post: [paste your post here]
    ```
-   Example: "I have a blog created with Blog in a Box at ~/Projects/my-blog. Please publish this post: Today I learned about..."
+   Example: "I have a blog created with Blog in a Prompt at ~/Projects/my-blog. Please publish this post: Today I learned about..."
 
 4. **Claude will**:
    - Ask for permission to access your Projects folder (approve this)

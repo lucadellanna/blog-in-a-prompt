@@ -385,6 +385,7 @@ You must enforce this structure exactly:
 ```
 /
 ├─ app/
+│  ├─ layout.tsx          # Required: Root layout with html/body, imports globals.css
 │  ├─ page.tsx
 │  ├─ about/page.tsx
 │  └─ posts/[slug]/page.tsx
@@ -399,9 +400,31 @@ You must enforce this structure exactly:
 │  └─ Nav.tsx
 ├─ styles/
 │  └─ globals.css
+├─ .gitignore             # Must include entries below
 ├─ next.config.js
 ├─ package.json
 └─ README.md
+```
+
+**Required .gitignore entries:**
+```
+# Dependencies
+node_modules/
+
+# Next.js
+.next/
+out/
+
+# Vercel
+.vercel/
+.vercel-url
+
+# Environment
+.env
+.env*.local
+
+# OS
+.DS_Store
 ```
 
 Rules:
@@ -698,14 +721,19 @@ After linking the project, verify the integration is working:
    - Use AskUserQuestion to confirm connection is established
 4. **Test the integration:**
    - Create a test branch: `git checkout -b test-vercel-integration`
-   - Make a trivial commit: `echo "test" > .vercel-test && git add . && git commit -m "test vercel integration"`
+   - Make a trivial change to an existing file (e.g., add a comment to `next.config.js`):
+     ```bash
+     echo "// Vercel integration test - safe to delete this comment" >> next.config.js
+     git add next.config.js
+     git commit -m "test vercel integration"
+     ```
    - Push: `git push -u origin test-vercel-integration`
    - Check if Vercel created a preview deployment: `vercel list`
-   - If preview appears, integration is working - clean up:
+   - **Clean up regardless of result:**
      - Switch back to main: `git checkout main`
      - Delete local branch: `git branch -D test-vercel-integration`
      - Delete remote branch: `git push origin --delete test-vercel-integration`
-   - If no preview, troubleshoot integration before proceeding
+   - If no preview appeared, troubleshoot integration before proceeding
 
 ### 9.3 First production deployment
 
@@ -780,11 +808,15 @@ If previews are not automatically available, you may deploy a preview via CLI an
 5. Retry the deployment
 6. If unable to resolve automatically, provide clear instructions for what the user needs to do
 
-**Fallback:**
-- If preview deployment repeatedly fails, you may proceed with showing the user the post content directly in the conversation
-- Ask approval based on the content you show them
-- Then merge to main and deploy to production
-- Inform the user: "I couldn't create a preview, but here's what the post will look like. Should I publish it?"
+**Fallback (after 2 failed attempts):**
+
+If preview deployment fails twice:
+1. **Show the post content inline** - render the post title, date, and body text directly in the conversation
+2. **Explain clearly**: "I wasn't able to create a preview link, but here's exactly what your post will look like:"
+3. **Display the formatted post** with title, date, and content
+4. **Add disclaimer**: "The actual blog will have your site's styling applied"
+5. **Ask for approval**: "Should I publish this post? (yes/no)"
+6. If approved, merge to main and deploy to production as normal
 
 ### 10.3 Approval gate (Mandatory)
 

@@ -425,6 +425,11 @@ out/
 
 # OS
 .DS_Store
+
+# Logs
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
 ```
 
 Rules:

@@ -52,7 +52,27 @@ Create a **minimal, text-only blog** such that:
 
 ## 2. Claude Code Operating Rules
 
-### 2.1 AskUserQuestion tool usage
+### 2.1 Progress tracking with Task tool
+
+**IMPORTANT:** Use the Task tool (TaskCreate, TaskUpdate, TaskList) to show the user progress as you build their blog. This helps non-technical users understand what's happening.
+
+At the start of setup, create tasks for each major phase:
+1. "Set up project folder"
+2. "Create Next.js app"
+3. "Configure blog structure"
+4. "Set up GitHub repository"
+5. "Deploy to Vercel"
+6. "Create first sample post"
+7. "Verify everything works"
+
+As you work:
+- Mark each task as `in_progress` when you start it
+- Mark each task as `completed` when done
+- If a task fails, keep it `in_progress` and explain what you're doing to fix it
+
+This gives the user a clear view of progress and builds confidence that things are working.
+
+### 2.2 AskUserQuestion tool usage
 
 Use **AskUserQuestion** when you need:
 - a choice that changes outcomes (site title, repo name)
@@ -72,7 +92,7 @@ Rules:
   - Tell them what you're doing to fix it
   - Example: Instead of "ENOENT error on package.json", say "I couldn't find a required file, so I'm creating it now"
 
-### 2.2 Start-of-project initialization
+### 2.3 Start-of-project initialization
 
 At the beginning, do all of this **in this exact order** (scaffolding must happen first because `create-next-app` requires an empty directory):
 
@@ -81,7 +101,7 @@ At the beginning, do all of this **in this exact order** (scaffolding must happe
 3. Run `/init`
 4. Create `.claude/settings.local.json` with pre-approved commands (see below)
 5. Create `.claude/rules/` and write a few short rules docs that extract the enforceable constraints from this file
-6. Create `.claude/skills/` and add essential blog management skills (see Section 2.3 below)
+6. Create `.claude/skills/` and add essential blog management skills (see Section 2.4 below)
 7. Create `CLAUDE.md` with project-specific instructions (see below)
 
 Required rules docs (create these exact filenames):
@@ -200,11 +220,11 @@ When user provides a blog post draft:
 - Keeps the project maintainable by documenting core constraints
 - **CRITICAL**: This file will be read by future Claude instances, so it must be clear and actionable
 
-### 2.3 Required skills (Create after initial setup completes)
+### 2.4 Required skills (Create after initial setup completes)
 
-After the blog is successfully deployed, create these skills in `.claude/skills/`:
+After the blog is successfully deployed, create these skills in `.claude/skills/` using the directory structure (each skill gets its own folder with a `skill.md` file):
 
-**`.claude/skills/publish.md`** (CRITICAL):
+**`.claude/skills/publish/skill.md`** (CRITICAL):
 ```markdown
 # Publish Blog Post
 
@@ -230,7 +250,7 @@ Publish a blog post from draft to production.
 - All git operations must be transparent to user
 ```
 
-**`.claude/skills/blog-health.md`** (RECOMMENDED):
+**`.claude/skills/blog-health/skill.md`** (RECOMMENDED):
 ```markdown
 # Blog Health Check
 
@@ -255,7 +275,7 @@ Diagnose and fix common blog issues.
 - Sync git repo if out of sync
 ```
 
-**`.claude/skills/rollback.md`** (RECOMMENDED):
+**`.claude/skills/rollback/skill.md`** (RECOMMENDED):
 ```markdown
 # Rollback Deployment
 
@@ -281,12 +301,12 @@ Rollback to a previous working deployment if something breaks.
 ```
 
 **When to create these skills:**
-- Create them during the completion hardening steps (Section 2.5 step 9)
+- Create them during the completion hardening steps (Section 2.6 step 9)
 - This happens AFTER production deployment succeeds but BEFORE showing the completion message to the user
 - Use the `/create-skill` command for each
 - Test the `/publish` skill by having it create (but not publish to production) a second sample post - verify the workflow works
 
-### 2.4 Version pinning and compatibility (Reduce brittleness)
+### 2.5 Version pinning and compatibility (Reduce brittleness)
 
 To ensure the blog remains working over time:
 
@@ -325,20 +345,22 @@ After every production deployment:
 4. If non-200, check Vercel logs and fix issues before declaring success
 5. Optionally visit `<production-url>/posts/<latest-post-slug>` to verify latest post renders
 
-### 2.5 Completion hardening steps (Mandatory)
+### 2.6 Completion hardening steps (Mandatory)
 
 After you implement everything in this file and before declaring completion:
 1. Re-read this entire file and verify every requirement is satisfied
-2. Verify version pinning is correct in package.json (Section 2.4)
+2. Verify version pinning is correct in package.json (Section 2.5)
 3. Run: `npx skills add https://github.com/vercel-labs/agent-skills --skill vercel-react-best-practices`
 4. Run: `npx skills add https://github.com/vercel-labs/agent-skills --skill web-design-guidelines`
 5. Run: `/vercel-react-best-practices`
 6. Run: `/web-design-guidelines`
-7. Run: `/code-review`
+7. Run a code review on all project files (not just uncommitted changes):
+   - Review all files in `app/`, `lib/`, `components/`, and config files
+   - Check for TypeScript errors, accessibility issues, and code quality
 8. Apply any fixes required by best-practices, design guidelines, and code review, while preserving the MVP scope (no feature creep)
-9. **Create the required skills** from Section 2.3 using `/create-skill`
+9. **Create the required skills** from Section 2.4 using `/create-skill`
 10. **Test the `/publish` skill** by having it publish a second sample post
-11. **Validate production deployment** works as described in Section 2.4
+11. **Validate production deployment** works as described in Section 2.5
 
 ---
 
@@ -528,6 +550,26 @@ Implement:
 - `app/page.tsx` (home listing)
 - `app/about/page.tsx` (renders about.mdx)
 - `app/posts/[slug]/page.tsx` (renders post)
+
+**IMPORTANT - Next.js 15+ params change:**
+In Next.js 15+, the `params` prop in dynamic route pages is a **Promise** and must be awaited. Use this pattern for `app/posts/[slug]/page.tsx`:
+
+```tsx
+// CORRECT for Next.js 15+
+export default async function Post({ params }: { params: Promise<{ slug: string }> }) {
+  const { slug } = await params;
+  const post = getPostBySlug(slug);
+  // ...
+}
+
+// WRONG - will cause 404 errors
+export default function Post({ params }: { params: { slug: string } }) {
+  const post = getPostBySlug(params.slug);  // params.slug is undefined!
+  // ...
+}
+```
+
+The same applies to `generateMetadata` and `generateStaticParams` if they use params.
 
 ### 7.7 Local validation
 
@@ -755,22 +797,41 @@ Rules:
 
 ---
 
-## 11. Custom Domain (Optional, After First Production Deploy)
+## 11. Custom Domain (Optional)
 
-After first successful production deploy:
+This section is triggered when the user selects "Connect a custom domain" from the end-of-setup question, or asks about it later.
 
-AskUserQuestion:
-"Do you want to add a custom domain now? (yes/no)"
+**When the user wants to connect a custom domain:**
 
-If yes:
-- AskUserQuestion for the domain name
-- Guide the user through adding it in Vercel and updating DNS at registrar
-- Do not assume access to registrar
+1. AskUserQuestion: "What's your domain name? (e.g., yourname.com or blog.yourname.com)"
 
-This is advisory and must not block completion
+2. Add the domain to Vercel:
+   ```bash
+   vercel domains add <their-domain>
+   ```
 
-If no:
-- Do nothing
+3. Explain in plain language what DNS records they need to add:
+   - For root domain (yourname.com): "You'll need to add an A record pointing to `76.76.21.21`"
+   - For subdomain (blog.yourname.com): "You'll need to add a CNAME record pointing to `cname.vercel-dns.com`"
+
+4. Provide simple instructions:
+   "To connect your domain, you'll need to update your DNS settings at your domain registrar (where you bought the domain - like GoDaddy, Namecheap, Google Domains, etc.). Here's what to do:
+
+   1. Log into your domain registrar's website
+   2. Find the DNS settings for [their-domain]
+   3. Add this record: [specific record based on root vs subdomain]
+   4. Save the changes
+
+   DNS changes can take up to 48 hours to propagate, but usually work within a few minutes. Let me know when you've made the change and I'll verify it's working."
+
+5. After user confirms DNS is updated, verify:
+   ```bash
+   vercel domains inspect <their-domain>
+   ```
+
+6. If verification succeeds, confirm: "Your domain is connected! Your blog is now live at https://[their-domain]"
+
+7. If verification fails, explain the issue in plain language and offer to check again later.
 
 ---
 
@@ -917,17 +978,42 @@ You must verify all of the following are true:
 - Preview-first publishing flow is feasible and documented in README
 - You did not add excluded features
 
-Then do the completion hardening steps from Section 2.5:
+Then do the completion hardening steps from Section 2.6:
 - Re-read this entire file and verify compliance
 - `npx skills add https://github.com/vercel-labs/agent-skills --skill vercel-react-best-practices`
 - `npx skills add https://github.com/vercel-labs/agent-skills --skill web-design-guidelines`
 - `/vercel-react-best-practices`
 - `/web-design-guidelines`
-- `/code-review`
+- Code review all project files (not just uncommitted changes)
 - Apply fixes without scope creep
-- Create the required skills from Section 2.3
+- Create the required skills from Section 2.4
 - Test the `/publish` skill
 - Validate production deployment
+- Ask what the user wants to do next (see below)
+
+**Before showing the completion message, ask what the user wants to do next:**
+
+AskUserQuestion:
+"Your blog is live! 🎉 What would you like to do next? (You can pick more than one, or say 'nothing for now')
+
+1. Delete the sample 'Hello World' post
+2. Create your first real blog post
+3. Connect a custom domain (like yourname.com)
+4. Add a hero section to the homepage
+5. Make it look like another blog you admire
+6. Improve the visual appearance (colors, fonts, etc.)
+7. Something else (tell me what!)
+8. Nothing for now - I'll explore on my own"
+
+**Handle each selection:**
+- **Delete sample post**: Remove `content/posts/YYYY-MM-DD-hello-world.mdx`, commit, push, and redeploy
+- **Create first post**: Ask for their draft content, then follow Section 10 publishing workflow
+- **Custom domain**: Follow Section 11 to guide them through DNS setup
+- **Add hero section**: Ask what they want in the hero (headline, tagline, call-to-action) and add a simple hero component above the post list
+- **Look like another blog**: Ask for the URL of the blog they admire, analyze its visual style (colors, typography, layout), and adapt those elements to their blog while staying within MVP scope
+- **Improve visuals**: Ask what they'd like to change (colors, fonts, layout) and implement within MVP scope
+- **Something else**: Listen to their request and help if within scope
+- **Nothing for now**: Proceed to completion message
 
 Only then declare completion.
 
@@ -960,8 +1046,13 @@ Your blog is now published and ready to use. Here's what you can do next:
 
 📚 **Manage posts:**
    - Edit existing posts: "edit the post about [topic]"
+   - Delete a post: "delete the post about [topic]"
    - View all posts: Visit your blog's home page
    - Rollback if needed: "rollback to previous version"
+
+🌐 **Custom domain:**
+   - Want to use your own domain (like yourname.com)? Just ask!
+   - I'll guide you through connecting it to your blog
 
 💡 **Tips:**
    - Your blog repository is at: [GitHub repo URL]

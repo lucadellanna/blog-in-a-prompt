@@ -445,15 +445,10 @@ Create a Next.js app using the official CLI:
 npx create-next-app@latest . --typescript --tailwind --app --no-src-dir --import-alias "@/*"
 ```
 
-**Important:** Use the `.` to install in the current directory.
-
-If prompted interactively, answer:
-- Would you like to use TypeScript? → Yes
-- Would you like to use ESLint? → Yes
-- Would you like to use Tailwind CSS? → Yes
-- Would you like to use `src/` directory? → No
-- Would you like to use App Router? → Yes
-- Would you like to customize the default import alias? → No
+**Important:**
+- Use the `.` to install in the current directory
+- The flags above configure the project non-interactively (TypeScript, Tailwind, App Router, no src directory)
+- If any interactive prompts still appear, accept the defaults that match the flags above
 
 Then implement:
 - MDX support (next section)
@@ -603,7 +598,11 @@ After linking the project, verify the integration is working:
    - Make a trivial commit: `echo "test" > .vercel-test && git add . && git commit -m "test vercel integration"`
    - Push: `git push -u origin test-vercel-integration`
    - Check if Vercel created a preview deployment: `vercel list`
-   - If preview appears, integration is working - clean up test branch
+   - If preview appears, integration is working - clean up:
+     - Remove test file: `rm .vercel-test`
+     - Switch back to main: `git checkout main`
+     - Delete local branch: `git branch -D test-vercel-integration`
+     - Delete remote branch: `git push origin --delete test-vercel-integration`
    - If no preview, troubleshoot integration before proceeding
 
 ### 9.3 First production deployment

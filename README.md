@@ -88,7 +88,7 @@ You'll use these accounts during the blog setup process.
    ```
    mkdir -p ~/Projects
    cd ~/Projects
-   mkdir my-blog
+   mkdir -p my-blog
    cd my-blog
    curl -o PROMPT.md https://raw.githubusercontent.com/lucadellanna/blog-in-a-box/main/PROMPT.md
    ```

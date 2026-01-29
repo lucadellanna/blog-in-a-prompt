@@ -101,7 +101,7 @@ At the beginning, do all of this **in this exact order** (scaffolding must happe
 3. Run `/init`
 4. Create `.claude/settings.local.json` with pre-approved commands (see below)
 5. Create `.claude/rules/` and write a few short rules docs that extract the enforceable constraints from this file
-6. Create `.claude/skills/` and add essential blog management skills (see Section 2.4 below)
+6. Create `.claude/skills/` directory (skills will be added during completion hardening - see Section 2.4)
 7. Create `CLAUDE.md` with project-specific instructions (see below)
 
 Required rules docs (create these exact filenames):
@@ -125,7 +125,6 @@ Create this file to allow common blog management commands without prompting:
       "Bash(which *)",
       "Bash(ls *)",
       "Bash(pwd)",
-      "Bash(mkdir *)",
       "Bash(git status*)",
       "Bash(git diff*)",
       "Bash(git log*)",
@@ -140,12 +139,13 @@ Create this file to allow common blog management commands without prompting:
 
 **Why only these commands:**
 These are read-only or local-only operations that cannot modify data, execute arbitrary code, or affect external services:
-- `which *`, `ls *`, `pwd`, `mkdir *` - Safe filesystem utilities
+- `which *`, `ls *`, `pwd` - Safe filesystem utilities
 - `git status`, `git diff`, `git log`, `git branch` - Read-only git queries
 - `gh auth status` - Just checks auth, doesn't modify anything
 - `vercel --version`, `vercel list` - Read-only Vercel queries
 
 **Commands that will prompt the user (by design):**
+- `mkdir` - Creates directories (user should confirm location)
 - `npm install`, `npm run *` - Runs scripts that can execute arbitrary code
 - `npx *` - Downloads and runs packages
 - `git add`, `git commit`, `git push` - Modifies repo state
@@ -304,7 +304,7 @@ Rollback to a previous working deployment if something breaks.
 - Create them during the completion hardening steps (Section 2.6 step 9)
 - This happens AFTER production deployment succeeds but BEFORE showing the completion message to the user
 - Use the `/create-skill` command for each
-- Test the `/publish` skill by having it create (but not publish to production) a second sample post - verify the workflow works
+- Commit and push the skills to GitHub (Section 2.6 step 10)
 
 ### 2.5 Version pinning and compatibility (Reduce brittleness)
 
@@ -314,10 +314,10 @@ To ensure the blog remains working over time:
 ```json
 {
   "dependencies": {
-    "next": "^14.0.0",
-    "react": "^18.0.0",
-    "react-dom": "^18.0.0",
-    "@next/mdx": "^14.0.0",
+    "next": "^15.0.0",
+    "react": "^19.0.0",
+    "react-dom": "^19.0.0",
+    "@next/mdx": "^15.0.0",
     "@mdx-js/loader": "^3.0.0",
     "@mdx-js/react": "^3.0.0"
   },
@@ -359,7 +359,7 @@ After you implement everything in this file and before declaring completion:
    - Check for TypeScript errors, accessibility issues, and code quality
 8. Apply any fixes required by best-practices, design guidelines, and code review, while preserving the MVP scope (no feature creep)
 9. **Create the required skills** from Section 2.4 using `/create-skill`
-10. **Test the `/publish` skill** by having it publish a second sample post
+10. **Commit and push the new skills to GitHub**
 11. **Validate production deployment** works as described in Section 2.5
 
 ---
@@ -488,6 +488,11 @@ Before implementing, ask the user for these required details (use AskUserQuestio
    - Example: if blog title is "Jane's Tech Blog" → suggest "janes-tech-blog"
    - Use AskUserQuestion: "I'll create a GitHub repository called '[suggestion]'. Is that okay, or would you prefer a different name?"
 
+3. **About page content**: "What would you like written on your About page? (Tell me about yourself, what you write about, etc.)"
+   - Take the user's response and write a well-formatted About page based on their input
+   - If the user provides minimal information, expand it slightly while staying true to what they said
+   - Keep it concise and personal
+
 Store these values to use throughout the setup process.
 
 ### 7.1 Choose project folder
@@ -507,10 +512,10 @@ Store these values to use throughout the setup process.
 
 ### 7.3 Scaffold Next.js app
 
-Create a Next.js app using the official CLI:
+Create a Next.js app using the official CLI (pinned to Next.js 15):
 
 ```bash
-npx create-next-app@latest . --typescript --tailwind --app --eslint --import-alias "@/*" --yes
+npx create-next-app@15 . --typescript --tailwind --app --eslint --import-alias "@/*" --yes
 ```
 
 **Important:**
@@ -538,9 +543,8 @@ Requirements:
 
 Create:
 - `content/pages/about.mdx`:
-  - Use **AskUserQuestion** to ask: "What would you like written on your About page? (Tell me about yourself, what you write about, etc.)"
-  - Take the user's response and write a well-formatted About page based on their input
-  - If the user provides minimal information, expand it slightly while staying true to what they said
+  - Use the About page content gathered in Section 7.0
+  - Write a well-formatted About page based on their input
   - Keep it concise and personal
 - `content/posts/` with at least one sample post: `YYYY-MM-DD-hello-world.mdx` (use today's date)
 
@@ -588,9 +592,11 @@ If any errors:
 
 ### 8.1 Repo naming and privacy
 
-AskUserQuestion:
-- repo name (suggest a default)
-- confirm privacy: default is private, only make public if user explicitly requests it
+Use the repository name gathered in Section 7.0. Confirm privacy:
+- Default is private
+- Only make public if user explicitly requests it
+
+**If the repo name is already taken on GitHub**, ask the user for an alternative name.
 
 ### 8.2 Git operations
 
@@ -829,7 +835,7 @@ This section is triggered when the user selects "Connect a custom domain" from t
    vercel domains inspect <their-domain>
    ```
 
-6. If verification succeeds, confirm: "Your domain is connected! Your blog is now live at https://[their-domain]"
+6. If verification succeeds, confirm: "Your domain is connected! Your blog is now live at https://[their-domain]. Vercel automatically set up HTTPS for you, so your site is secure."
 
 7. If verification fails, explain the issue in plain language and offer to check again later.
 
@@ -987,7 +993,7 @@ Then do the completion hardening steps from Section 2.6:
 - Code review all project files (not just uncommitted changes)
 - Apply fixes without scope creep
 - Create the required skills from Section 2.4
-- Test the `/publish` skill
+- Commit and push the skills to GitHub
 - Validate production deployment
 - Ask what the user wants to do next (see below)
 
@@ -1056,7 +1062,7 @@ Your blog is now published and ready to use. Here's what you can do next:
 
 💡 **Tips:**
    - Your blog repository is at: [GitHub repo URL]
-   - The `/publish` skill makes publishing easy
+   - Just say "publish this" and I'll handle everything
    - All git operations happen automatically - you never need to run commands
 
 What would you like to do next?

@@ -82,16 +82,22 @@ You'll use these accounts during the blog setup process.
    - **Windows**: Open PowerShell (search for "PowerShell" in the Start menu)
 
 2. **Create folders and download setup instructions**:
-   - Select and copy all 5 lines in the code block below (just the lines, not the \`\`\` marks around them)
-   - Paste them into Terminal (Mac) or PowerShell (Windows)
-   - Press Enter
-   ```
-   mkdir -p ~/Projects
-   cd ~/Projects
-   mkdir -p my-blog
-   cd my-blog
+   The commands are different for Mac and Windows. Copy the entire block for your operating system.
+
+   **On Mac (in Terminal):**
+   ```bash
+   mkdir -p ~/Projects/my-blog
+   cd ~/Projects/my-blog
    curl -o PROMPT.md https://raw.githubusercontent.com/lucadellanna/blog-in-a-box/main/PROMPT.md
    ```
+
+   **On Windows (in PowerShell):**
+   ```powershell
+   New-Item -Path "$HOME/Projects/my-blog" -ItemType Directory -Force
+   cd "$HOME/Projects/my-blog"
+   curl.exe -o PROMPT.md https://raw.githubusercontent.com/lucadellanna/blog-in-a-box/main/PROMPT.md
+   ```
+
    This downloads the instructions that Claude will follow to build your blog.
 
 3. **Start Claude Code**:
@@ -262,8 +268,8 @@ This is provided as-is. The creator is not responsible for any issues, costs, or
 
 ---
 
-For any questions, contact me at [Luca-Dellanna.com/contact](https://www.luca-dellanna.com/contact/)
+For any questions, [contact me](https://luca-dellanna.com/contact/).
 
 ## About the Author
 
-I'm Luca Dellanna ([Luca-Dellanna.com](https://Luca-Dellanna.com)), an independent management consultant helping businesses nail change initiatives (including AI) and the author of several books ([Luca-Dellanna.com/books](https://Luca-Dellanna.com/books)).
+I'm Luca Dellanna ([luca-dellanna.com](https://luca-dellanna.com)), an independent management consultant helping businesses nail change initiatives (including AI) and the author of several books ([view my books](https://luca-dellanna.com/books)).

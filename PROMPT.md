@@ -599,7 +599,6 @@ After linking the project, verify the integration is working:
    - Push: `git push -u origin test-vercel-integration`
    - Check if Vercel created a preview deployment: `vercel list`
    - If preview appears, integration is working - clean up:
-     - Remove test file: `rm .vercel-test`
      - Switch back to main: `git checkout main`
      - Delete local branch: `git branch -D test-vercel-integration`
      - Delete remote branch: `git push origin --delete test-vercel-integration`

@@ -14,6 +14,15 @@ Your blog will be:
 
 *Claude Code may require a paid plan (check claude.ai for current pricing). GitHub and Vercel hosting are free on their free tiers.
 
+## What Your Blog Can Become
+
+Your imagination is the limit. The initial setup creates a minimal, clean blog—but that's just the starting point. After setup, Claude will ask about your visual preferences: what style you like, whether there's another blog you'd like yours to resemble, colors, fonts, and more.
+
+From there, you can keep asking Claude to add features and customize your blog however you want. For reference, [luca-dellanna.com/blog](https://luca-dellanna.com/blog) was built entirely by asking Claude to add features—no manual coding required. (It took longer than 15 minutes, but only because of the many customizations added over time.)
+
+![Blog comparison](images/blog-comparison.png)
+*An example of a minimal blog created with this prompt (left) and of what continuing by asking Claude to add features can look like (right).*
+
 ## What You Need
 
 ### Step 1: Create Accounts (Everyone - Do This First)

@@ -10,17 +10,19 @@ Your blog will be:
 - Live on the internet with its own web address
 - Public (anyone can read it)
 - Simple and fast - just text, no clutter
-- Free to run (using free hosting services)
+- Free to run (using free hosting services)*
+
+*Claude Code may require a paid plan (check claude.ai for current pricing). GitHub and Vercel hosting are free on their free tiers.
 
 ## What You Need
 
 ### Step 1: Create Accounts (Everyone - Do This First)
 
-**Create these three free accounts before installing any software:**
+**Create these three accounts before installing any software:**
 
-- **GitHub account**: Go to [github.com](https://github.com) and sign up
+- **GitHub account**: Go to [github.com](https://github.com) and sign up. This is where your blog's files will be stored (in what's called a "repository" - like a folder in the cloud).
 - **Vercel account**: Go to [vercel.com](https://vercel.com) and sign up (use "Continue with GitHub" button)
-- **Anthropic account** (for Claude): Go to [anthropic.com](https://anthropic.com) and sign up
+- **Claude account**: Go to [claude.ai](https://claude.ai) and sign up. You may need a paid plan to use Claude Code (check claude.ai for current pricing).
 
 You'll use these accounts during the blog setup process.
 
@@ -37,26 +39,28 @@ You'll use these accounts during the blog setup process.
      /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
      ```
    - Follow the instructions on screen (this may take a few minutes)
+   - When it's done, you'll see "Installation successful" and your prompt will return (the line where you can type again). You may also be prompted to install Apple's Command Line Tools (includes Git), which Claude uses to save your blog's files.
 
 2. Install **Node.js** (software that runs websites):
    - In Terminal, paste this command and press Enter:
      ```
      brew install node
      ```
-   - Wait for it to finish
+   - You'll know it's done when you see your prompt again (the line where you can type)
 
 3. Install **Claude Code** (the AI that builds your blog):
    - In Terminal, paste this command and press Enter:
      ```
      curl -fsSL https://claude.ai/install.sh | bash
      ```
-   - Wait for it to finish, then close and reopen Terminal
+   - You'll see a message confirming Claude Code was installed
+   - Close and reopen Terminal before continuing
 
 #### For Windows Users
 
 1. Install **Node.js**:
    - Go to [nodejs.org](https://nodejs.org)
-   - Download the "LTS" version (recommended for most users)
+   - Download the "LTS" version (LTS stands for "Long Term Support" - it's the most stable version, recommended for most users)
    - Run the installer and follow the installation wizard
    - Accept all the default settings
 
@@ -71,18 +75,24 @@ You'll use these accounts during the blog setup process.
      ```
      irm https://claude.ai/install.ps1 | iex
      ```
-   - Wait for it to finish, then close and reopen PowerShell
+   - You'll see a message confirming Claude Code was installed
+   - Close and reopen PowerShell before continuing
 
 ## How to Create Your Blog
 
 **Note**: These steps work the same on Mac and Windows. On Mac, use Terminal. On Windows, use PowerShell.
 
-1. **Open your command line**:
+1. **Open Terminal (Mac) or PowerShell (Windows)**:
+   These apps are sometimes called the "command line" or "CLI" - they let you type commands to control your computer.
    - **Mac**: Open Terminal (Applications > Utilities > Terminal)
    - **Windows**: Open PowerShell (search for "PowerShell" in the Start menu)
 
 2. **Create folders and download setup instructions**:
-   The commands are different for Mac and Windows. Copy the entire block for your operating system.
+   These commands create a folder for your blog and download the instructions that Claude will follow to build it.
+
+   Note: `~/` (Mac) and `$HOME/` (Windows) mean your home folder - like /Users/YourName on Mac or C:\Users\YourName on Windows.
+
+   The commands are different for Mac and Windows. Copy the entire block for your operating system:
 
    **On Mac (in Terminal):**
    ```bash
@@ -98,8 +108,6 @@ You'll use these accounts during the blog setup process.
    curl.exe -o PROMPT.md https://raw.githubusercontent.com/lucadellanna/blog-in-a-prompt/main/PROMPT.md
    ```
 
-   This downloads the instructions that Claude will follow to build your blog.
-
 3. **Start Claude Code**:
    ```
    claude
@@ -113,12 +121,14 @@ You'll use these accounts during the blog setup process.
    Please read the PROMPT.md file in this folder and follow all instructions in it
    ```
 
+   **What to expect**: Over the next 10-15 minutes, Claude will ask you a few questions, then work automatically. You'll see a lot of text scrolling by - this is normal! Claude is building your blog.
+
 5. **Answer a few questions**:
-   - Claude will ask for your blog name, repository name (the name for your blog's storage on GitHub), etc.
+   - Claude will ask for your blog name, your name for the About page, etc.
    - Just type your answers and press Enter
    - Claude does everything else automatically
 
-6. **Wait 10-20 minutes**:
+6. **Wait for Claude to finish** (10-15 minutes):
    - Claude builds your blog
    - Sets up your GitHub repository
    - Deploys it to the internet
@@ -126,11 +136,13 @@ You'll use these accounts during the blog setup process.
 
    Once complete, your blog is live! You can close Terminal/PowerShell. The blog stays online - you don't need to keep anything running.
 
+   **If you accidentally close Terminal/PowerShell during setup**: Don't worry - just reopen it, navigate to your blog folder (`cd ~/Projects/my-blog`), type `claude`, and tell Claude to continue where it left off.
+
 ## How to Publish New Posts
 
-You have four options for publishing:
+You have four options for publishing. **Recommended for beginners: Option 1** - it uses the same Terminal/PowerShell you used to create the blog. Options 2-4 are alternatives for specific situations.
 
-### Option 1: Using Claude Code (Terminal)
+### Option 1: Using Claude Code (Terminal) - Recommended
 
 1. **Write your post** in any text editor (Notes, TextEdit, etc.)
 

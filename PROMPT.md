@@ -212,6 +212,90 @@ When user provides a blog post draft:
 - All git commands must be automatic and transparent
 - Use plain language in all user communication
 - Keep the MVP scope - no feature creep without explicit user request
+
+## Returning Users
+
+**How to detect a returning user:**
+Check for these signs that the blog is already set up:
+
+**Strong signal (treat as returning):**
+- `.vercel-url` file exists (contains production URL)
+
+**Possible signals (could also be a fresh clone):**
+- `content/posts/` has posts beyond the sample "Hello World"
+- `content/pages/about.mdx` exists and contains content beyond frontmatter
+
+**Not sufficient on their own (these can exist in a fresh clone):**
+- `.git` directory exists (even with a remote configured)
+- `package.json` exists with Next.js dependencies
+
+If `.vercel-url` exists, this is a returning user - greet them and offer options rather than starting setup.
+
+If it's ambiguous, ask one quick clarifying question before proceeding:
+- "Is your blog already live, or are we setting it up for the first time?"
+
+When a user opens this project after the blog is already set up:
+
+1. **Greet them warmly and offer options**
+   - If `.vercel-url` exists: "Welcome back! Your blog is live at [URL]. Would you like to:"
+   - If the URL isn't known yet: "Welcome back! Is your blog already live? If so, what's the URL (or I can help you find it). Would you like to:"
+   - Publish a new post
+   - Edit an existing post
+   - Update the About page
+   - Change the look and feel
+   - Check if everything is working
+   - Something else
+
+2. **Remember they may not know the workflow**
+   - Don't assume they remember how publishing works
+   - Briefly remind them: "Just paste your draft and I'll handle the rest"
+
+3. **Avoid technical jargon entirely**
+   - Never mention: git, commit, push, pull, merge, branch, PR, repository, deploy
+   - Use instead: "save", "publish", "update", "your blog files", "make it live"
+
+4. **Be proactive with suggestions**
+   - If they seem unsure, offer concrete options
+   - "Would you like to write a new post, or update something on your blog?"
+
+## Explaining Pull Requests (If Required)
+
+If the workflow requires creating a PR (e.g., for team review or complex changes):
+
+1. **Explain what it is in plain terms:**
+   "Before publishing, I'll create a 'draft version' that you can preview. Think of it like saving a document as a draft before printing it."
+
+2. **Explain why it exists:**
+   "This lets you see exactly how your post will look before it goes live. If you like it, just say 'yes' and I'll make it public."
+
+3. **Guide them through it:**
+   "I've created your draft. Here's the preview: [link]. Take a look - if it looks good, just say 'publish' and I'll make it live."
+
+4. **Handle the mechanics invisibly:**
+   - Never ask them to "merge the PR" or "approve the PR"
+   - Never show them GitHub's interface unless absolutely necessary
+   - Never say "I'll push to main" - say "I'll publish your changes"
+   - Handle all git operations silently and automatically
+
+5. **If something needs their action on GitHub:**
+   - Explain exactly what to click, step by step
+   - Use screenshots or very specific instructions
+   - Offer to walk them through it
+   - Example: "GitHub is asking for your approval. Click the green 'Merge' button on this page: [link]. Let me know when you've done that."
+
+## Showing Visual Changes
+
+When the user asks for visual changes (colors, fonts, layout, hero section, etc.):
+
+1. Make the code changes locally
+2. Start the dev server in the background and save its process ID (PID), e.g., `npm run dev &` (PID is `$!`)
+3. Tell the user: "I've made the changes. You can preview them now at http://localhost:3000 - this is a private preview on your computer. Take a look and let me know if you'd like any adjustments."
+4. Wait for feedback and iterate locally (no deploy needed for each tweak)
+5. Once they're happy, publish the changes to the live site
+6. Stop the dev server using its PID when done, e.g., `kill <PID>`
+
+This is faster than waiting on Vercel previews for every small change. For anything you want to make live (new posts or permanent updates), follow the normal preview-then-publish workflow.
+
 ```
 
 **Why this matters:**
@@ -499,6 +583,11 @@ Rules:
 - No images
 - No tag UI
 - Tailwind is allowed. shadcn is allowed but not required and must not bloat the MVP
+- Use the user's chosen accent color (from Section 7.0) for links and hover states
+- Store the accent color as a CSS variable `--accent-color` in `styles/globals.css`
+- Default to black (#000000) if no accent color was specified
+- If the accent color is black (#000000), keep links clearly identifiable (e.g., underline by default and use a subtle hover change like opacity or underline thickness)
+- Keep accent color usage minimal and tasteful (links, active nav items, subtle highlights)
 
 ---
 
@@ -520,6 +609,13 @@ Before implementing, ask the user for these required details (use AskUserQuestio
    - Take the user's response and write a well-formatted About page based on their input
    - If the user provides minimal information, expand it slightly while staying true to what they said
    - Keep it concise and personal
+
+4. **Accent color**: "Do you have a favorite accent color for your blog? (e.g., 'blue', 'forest green', '#E63946') If not, I'll use a clean black-and-white design."
+   - If the user provides a color, use it for links, hover states, and subtle accents
+   - If the user says "no", "not really", or similar, default to black (#000000)
+   - Store the chosen color in a CSS variable (e.g., `--accent-color`) in `styles/globals.css` for easy future changes
+   - If the accent color is black (#000000), still style links so they look interactive (e.g., underline by default)
+   - Keep the overall design minimal - accent color should be used sparingly (links, active states, subtle highlights)
 
 Store these values to use throughout the setup process.
 
@@ -1057,6 +1153,14 @@ AskUserQuestion:
 - **Improve visuals**: Ask what they'd like to change (colors, fonts, layout) and implement within MVP scope
 - **Something else**: Listen to their request and help if within scope
 - **Nothing for now**: Proceed to completion message
+
+**Showing changes with the dev server (for visual/styling changes):**
+
+When the user requests visual changes after the blog is live (accent color, fonts, layout tweaks, hero section, etc.), follow the "## Showing Visual Changes" workflow above.
+
+Important:
+- Keep publishing mechanics invisible to the user (say "publish" / "make it live", not "commit/push/merge/deploy")
+- Use Vercel previews / production publishing only when you're ready to make changes live (new posts or finalized updates)
 
 Only then declare completion.
 

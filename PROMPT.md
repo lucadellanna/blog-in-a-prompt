@@ -76,11 +76,13 @@ Rules:
 
 At the beginning, do all of this **in this exact order** (scaffolding must happen first because `create-next-app` requires an empty directory):
 
-1. **Scaffold the Next.js app first** (see Section 7.3) — this must happen before creating any files
-2. Run `/init`
-3. Create `.claude/rules/` and write a few short rules docs that extract the enforceable constraints from this file
-4. Create `.claude/skills/` and add essential blog management skills (see Section 2.3 below)
-5. Create `CLAUDE.md` with project-specific instructions (see below)
+1. **Choose/create project folder first** (see Section 7.1) — ensure you have an empty directory before scaffolding
+2. **Scaffold the Next.js app** (see Section 7.3) — this must happen before creating any other files
+3. Run `/init`
+4. Create `.claude/settings.local.json` with pre-approved commands (see below)
+5. Create `.claude/rules/` and write a few short rules docs that extract the enforceable constraints from this file
+6. Create `.claude/skills/` and add essential blog management skills (see Section 2.3 below)
+7. Create `CLAUDE.md` with project-specific instructions (see below)
 
 Required rules docs (create these exact filenames):
 
@@ -91,6 +93,46 @@ Required rules docs (create these exact filenames):
 - `.claude/rules/project-structure.md`
 
 Each rules doc must be short, clear, and enforceable. Suggested contents are provided in Section 12 below.
+
+**Pre-approved commands (`.claude/settings.local.json`):**
+
+Create this file to allow common blog management commands without prompting:
+
+```json
+{
+  "permissions": {
+    "allow": [
+      "Bash(which *)",
+      "Bash(ls *)",
+      "Bash(pwd)",
+      "Bash(mkdir *)",
+      "Bash(git status*)",
+      "Bash(git diff*)",
+      "Bash(git log*)",
+      "Bash(git branch*)",
+      "Bash(gh auth status)",
+      "Bash(vercel --version)",
+      "Bash(vercel list)"
+    ]
+  }
+}
+```
+
+**Why only these commands:**
+These are read-only or local-only operations that cannot modify data, execute arbitrary code, or affect external services:
+- `which *`, `ls *`, `pwd`, `mkdir *` - Safe filesystem utilities
+- `git status`, `git diff`, `git log`, `git branch` - Read-only git queries
+- `gh auth status` - Just checks auth, doesn't modify anything
+- `vercel --version`, `vercel list` - Read-only Vercel queries
+
+**Commands that will prompt the user (by design):**
+- `npm install`, `npm run *` - Runs scripts that can execute arbitrary code
+- `npx *` - Downloads and runs packages
+- `git add`, `git commit`, `git push` - Modifies repo state
+- `gh repo create` - Creates resources (user should confirm which account/org)
+- `vercel`, `vercel --prod` - Deploys code (user should confirm which project)
+
+When prompted, the user can choose "Yes, and don't ask again for [command] in [project]" to auto-approve specific commands they trust.
 
 **CLAUDE.md requirements:**
 
@@ -428,9 +470,11 @@ Store these values to use throughout the setup process.
 
 ### 7.1 Choose project folder
 
-- If user is in an empty folder, proceed
-- If not, create a new folder in ~/Projects with the repository name
-- Use the folder name from the repository name decided above
+- Check if the current directory is empty (no files except hidden git files)
+- If not empty (e.g., `.claude` folder exists), create a new folder for the blog:
+  - Create `~/Projects/<repository-name>/` using the repo name from Section 7.0
+  - Change to that directory before scaffolding
+- This ensures `create-next-app` has an empty directory to work with
 
 ### 7.2 Preflight checks (agent does the checking)
 
@@ -444,13 +488,15 @@ Store these values to use throughout the setup process.
 Create a Next.js app using the official CLI:
 
 ```bash
-npx create-next-app@latest . --typescript --tailwind --app --no-src-dir --import-alias "@/*"
+npx create-next-app@latest . --typescript --tailwind --app --eslint --import-alias "@/*" --yes
 ```
 
 **Important:**
 - Use the `.` to install in the current directory
-- The flags above configure the project non-interactively (TypeScript, Tailwind, App Router, no src directory)
-- If any interactive prompts still appear, accept the defaults that match the flags above
+- Do NOT include `--src-dir` (omitting it keeps files in root, not in a src/ folder)
+- Do NOT include `--turbopack` or `--react-compiler` (these are experimental features not needed for the MVP)
+- The `--yes` flag uses defaults for any unprovided options, which should skip most interactive prompts
+- **If any prompts still appear** (e.g., "Use React Compiler?", "Use Turbopack?"), answer "No" to experimental features
 
 Then implement:
 - MDX support (next section)
@@ -510,12 +556,19 @@ AskUserQuestion:
 
 You must:
 - initialize git (if not already): `git init`
-- **configure git identity** (required for commits):
-  ```bash
-  git config user.name "Blog Author"
-  git config user.email "noreply@example.com"
-  ```
-  (Use generic values - user can change later if needed)
+- **configure git identity** (only if not already configured):
+  1. First check if git identity is already set:
+     ```bash
+     git config user.name
+     git config user.email
+     ```
+  2. If both return values, skip configuration (user already has git set up)
+  3. If either is missing, use AskUserQuestion: "I need to set up git for your blog. What name and email should I use for commits? (This will only apply to this project)"
+  4. Set the values using `--local` to avoid overwriting global config:
+     ```bash
+     git config --local user.name "Their Name"
+     git config --local user.email "their@email.com"
+     ```
 - commit the scaffold
 - create the GitHub repo
 - add remote
